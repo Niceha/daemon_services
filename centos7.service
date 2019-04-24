@@ -1,0 +1,20 @@
+[Unit]
+Description=php-fpm-exporter
+Documentation=https://github.com/bakins/php-fpm-exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ prometheus_owner }}
+Group={{ prometheus_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/php-fpm-exporter \
+	--addr={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prometheus_php_port }} \
+	--fastcgi=tcp://127.0.0.1:{{ php_fastcgi_port }} "
+
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
